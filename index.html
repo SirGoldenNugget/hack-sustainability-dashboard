@@ -6,9 +6,12 @@
 
 <body>
 	<canvas id="peak_energy_demand_chart"></canvas>
+	<canvas id="peak_temperature_chart"></canvas>
 	<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 	<script>
-		// Data: https://raw.githubusercontent.com/SirGoldenNugget/MVP-Website/master/pk_demand_temperature.csv
+		// Peak Energy Demand: https://raw.githubusercontent.com/SirGoldenNugget/hack-sustainability-dashboard/master/peak_energy_demand.csv
+		// FFX Housing: https://raw.githubusercontent.com/SirGoldenNugget/hack-sustainability-dashboard/master/ffx_housing.csv
+		// Peak Temperature: https://raw.githubusercontent.com/SirGoldenNugget/hack-sustainability-dashboard/master/peak_temperature.csv
 
 		const dates = [];
 		const energy = [];
@@ -19,9 +22,11 @@
 
 		getData();
 		getChart();
+		getTemperatureData();
+		getTemperatureChart();
 
 		async function getData() {
-			const response = await fetch('https://raw.githubusercontent.com/SirGoldenNugget/MVP-Website/master/pk_demand_temperature.csv');
+			const response = await fetch('https://raw.githubusercontent.com/SirGoldenNugget/hack-sustainability-dashboard/master/peak_energy_demand.csv');
 			const data = await response.text();
 
 			const table = data.trim().split('\n').slice(1);
@@ -48,19 +53,11 @@
 				data: {
 					labels: dates.slice(0, dates.length / 2),
 					datasets: [{
-						label: 'FY2017',
-						borderColor: 'rgb(055, 99, 132)',
-						backgroundColor: 'rgb(055, 99, 132)',
-						borderFill: 'rgb(055, 99, 132)',
+						label: 'FY2020',
+						borderColor: 'rgb(255, 99, 232)',
+						backgroundColor: 'rgb(255, 99, 232)',
 						fill: false,
-						data: FY2017
-					},
-					{
-						label: 'FY2018',
-						borderColor: 'rgb(255, 99, 132)',
-						backgroundColor: 'rgb(255, 99, 132)',
-						fill: false,
-						data: FY2018
+						data: FY2020
 					},
 					{
 						label: 'FY2019',
@@ -70,11 +67,19 @@
 						data: FY2019
 					},
 					{
-						label: 'FY2020',
-						borderColor: 'rgb(255, 99, 232)',
-						backgroundColor: 'rgb(255, 99, 232)',
+						label: 'FY2018',
+						borderColor: 'rgb(255, 99, 132)',
+						backgroundColor: 'rgb(255, 99, 132)',
 						fill: false,
-						data: FY2020
+						data: FY2018
+					},
+					{
+						label: 'FY2017',
+						borderColor: 'rgb(055, 99, 132)',
+						backgroundColor: 'rgb(055, 99, 132)',
+						borderFill: 'rgb(055, 99, 132)',
+						fill: false,
+						data: FY2017
 					}]
 				},
 				options: {
@@ -116,6 +121,107 @@
 			});
 		}
 
+		const tdates = [];
+		const tFY2017 = [];
+		const tFY2018 = [];
+		const tFY2019 = [];
+		const tFY2020 = [];
+
+		async function getTemperatureData() {
+			const response = await fetch('https://raw.githubusercontent.com/SirGoldenNugget/hack-sustainability-dashboard/master/peak_temperature.csv');
+			const data = await response.text();
+
+			const table = data.trim().split('\n').slice(1);
+			table.forEach(e => {
+				const row = e.split(',');
+				if (row[0] != "")
+					tdates.push(row[0]);
+				if (row[1] != "")
+					tFY2017.push(row[1]);
+				if (row[2] != "")
+					tFY2018.push(row[2]);
+				if (row[3] != "")
+					tFY2019.push(row[3]);
+				if (row[4] != "")
+					tFY2020.push(row[4]);
+			});
+		}
+
+		async function getTemperatureChart() {
+			await getTemperatureData();
+			const ctx = document.getElementById('peak_temperature_chart').getContext('2d');
+			const chart = new Chart(ctx, {
+				type: 'line',
+				data: {
+					labels: tdates.slice(0, tdates.length / 2),
+					datasets: [{
+						label: 'FY2020',
+						borderColor: 'rgb(255, 99, 232)',
+						backgroundColor: 'rgb(255, 99, 232)',
+						fill: false,
+						data: tFY2020
+					},
+					{
+						label: 'FY2019',
+						borderColor: 'rgb(255, 199, 132)',
+						backgroundColor: 'rgb(255, 199, 132)',
+						fill: false,
+						data: tFY2019
+					},
+					{
+						label: 'FY2018',
+						borderColor: 'rgb(255, 99, 132)',
+						backgroundColor: 'rgb(255, 99, 132)',
+						fill: false,
+						data: tFY2018
+					},
+					{
+						label: 'FY2017',
+						borderColor: 'rgb(055, 99, 132)',
+						backgroundColor: 'rgb(055, 99, 132)',
+						borderFill: 'rgb(055, 99, 132)',
+						fill: false,
+						data: tFY2017
+					}]
+				},
+				options: {
+					title: {
+						display: true,
+						text: 'George Mason Peak Temperature'
+					},
+					scales: {
+						yAxes: [{
+							scaleLabel: {
+								display: true,
+								labelString: 'Temperature'
+							}
+						}],
+						xAxes: [{
+							scaleLabel: {
+								display: true,
+								labelString: 'Date'
+							}
+						}]
+					},
+					spanGaps: true,
+					elements: {
+						line: {
+							skipNull: true,
+							drawNull: false,
+							spanGaps: true,
+						}
+					},
+					layout: {
+						padding: {
+							left: 50,
+							right: 50,
+							top: 50,
+							bottom: 50
+						}
+					}
+				}
+			});
+		}
 	</script>
 </body>
 
