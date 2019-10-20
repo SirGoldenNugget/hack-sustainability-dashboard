@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+</head>
+
+<body>
+	<canvas id="peak_energy_demand_chart"></canvas>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+	<script>
+		// Data: https://raw.githubusercontent.com/SirGoldenNugget/MVP-Website/master/pk_demand_temperature.csv
+
+		const dates = [];
+		const energy = [];
+		const FY2017 = [];
+		const FY2018 = [];
+		const FY2019 = [];
+		const FY2020 = [];
+
+		getData();
+		getChart();
+
+		async function getData() {
+			const response = await fetch('https://raw.githubusercontent.com/SirGoldenNugget/MVP-Website/master/pk_demand_temperature.csv');
+			const data = await response.text();
+
+			const table = data.trim().split('\n').slice(1);
+			table.forEach(e => {
+				const row = e.split(',');
+				if (row[0] != "")
+					dates.push(row[0]);
+				if (row[1] != "")
+					FY2017.push(row[1]);
+				if (row[2] != "")
+					FY2018.push(row[2]);
+				if (row[3] != "")
+					FY2019.push(row[3]);
+				if (row[4] != "")
+					FY2020.push(row[4]);
+			});
+		}
+
+		async function getChart() {
+			await getData();
+			const ctx = document.getElementById('peak_energy_demand_chart').getContext('2d');
+			const chart = new Chart(ctx, {
+				type: 'line',
+				data: {
+					labels: dates.slice(0, dates.length / 2),
+					datasets: [{
+						label: 'FY2017',
+						borderColor: 'rgb(055, 99, 132)',
+						backgroundColor: 'rgb(055, 99, 132)',
+						borderFill: 'rgb(055, 99, 132)',
+						fill: false,
+						data: FY2017
+					},
+					{
+						label: 'FY2018',
+						borderColor: 'rgb(255, 99, 132)',
+						backgroundColor: 'rgb(255, 99, 132)',
+						fill: false,
+						data: FY2018
+					},
+					{
+						label: 'FY2019',
+						borderColor: 'rgb(255, 199, 132)',
+						backgroundColor: 'rgb(255, 199, 132)',
+						fill: false,
+						data: FY2019
+					},
+					{
+						label: 'FY2020',
+						borderColor: 'rgb(255, 99, 232)',
+						backgroundColor: 'rgb(255, 99, 232)',
+						fill: false,
+						data: FY2020
+					}]
+				},
+				options: {
+					title: {
+						display: true,
+						text: 'George Mason Peak Energy Demand'
+					},
+					scales: {
+						yAxes: [{
+							scaleLabel: {
+								display: true,
+								labelString: 'Peak Energy Demand'
+							}
+						}],
+						xAxes: [{
+							scaleLabel: {
+								display: true,
+								labelString: 'Date'
+							}
+						}]
+					},
+					spanGaps: true,
+					elements: {
+						line: {
+							skipNull: true,
+							drawNull: false,
+							spanGaps: true,
+						}
+					},
+					layout: {
+						padding: {
+							left: 50,
+							right: 50,
+							top: 50,
+							bottom: 50
+						}
+					}
+				}
+			});
+		}
+
+	</script>
+</body>
+
+</html>
